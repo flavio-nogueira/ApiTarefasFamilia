@@ -104,11 +104,11 @@ pipeline {
             steps {
                 script {
                     sh """
-                        echo "API URL: http://76.13.69.127/apitarefafamilia"
+                        echo "API URL: http://76.13.69.127/apitarefasfamilia"
 
                         # Testar health endpoint via Ingress
                         for i in 1 2 3 4 5; do
-                            if curl -s -f "http://76.13.69.127/apitarefafamilia/health" > /dev/null; then
+                            if curl -s -f "http://76.13.69.127/apitarefasfamilia/health" > /dev/null; then
                                 echo "Health check passed!"
                                 exit 0
                             fi
