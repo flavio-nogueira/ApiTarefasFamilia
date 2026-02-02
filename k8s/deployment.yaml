@@ -6,7 +6,7 @@ metadata:
   labels:
     app: api-tarefas-familia
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: api-tarefas-familia
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: api-tarefas-familia
-          image: flavionogueira/api-tarefas-familia:latest
+          image: localhost:32000/api-tarefas-familia:latest
           ports:
             - containerPort: 8000
               protocol: TCP

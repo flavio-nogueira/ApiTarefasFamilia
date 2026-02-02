@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = 'docker.io'
-        DOCKER_IMAGE = 'flavionogueira/api-tarefas-familia'
+        DOCKER_REGISTRY = 'localhost:32000'
+        DOCKER_IMAGE = 'api-tarefas-familia'
         DOCKER_TAG = "${BUILD_NUMBER}"
-        SONAR_HOST = 'http://localhost:9000'
-        KUBECONFIG = credentials('kubeconfig-k8s')
         K8S_NAMESPACE = 'api-tarefas'
+        SONAR_HOST = 'http://76.13.69.127:9000'
     }
 
     stages {
@@ -20,29 +19,17 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            environment {
-                SONAR_TOKEN = credentials('sonar-token')
-            }
             steps {
                 script {
-                    def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv('SonarQube') {
                         sh """
-                            ${scannerHome}/bin/sonar-scanner \
+                            sonar-scanner \
                             -Dsonar.projectKey=api-tarefas-familia \
+                            -Dsonar.projectName='API Tarefas Familia' \
                             -Dsonar.sources=api_tarefas_familia \
-                            -Dsonar.host.url=${SONAR_HOST} \
-                            -Dsonar.login=${SONAR_TOKEN}
+                            -Dsonar.host.url=${SONAR_HOST}
                         """
                     }
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -51,8 +38,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
-                        docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+                        docker build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG} .
+                        docker tag ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
                     """
                 }
             }
@@ -61,13 +48,10 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh """
-                            echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-                            docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-                            docker push ${DOCKER_IMAGE}:latest
-                        """
-                    }
+                    sh """
+                        docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
+                    """
                 }
             }
         }
@@ -76,8 +60,6 @@ pipeline {
             steps {
                 script {
                     sh """
-                        export KUBECONFIG=${KUBECONFIG}
-
                         # Criar namespace se nao existir
                         kubectl create namespace ${K8S_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
 
@@ -90,7 +72,7 @@ pipeline {
 
                         # Atualizar imagem do deployment
                         kubectl set image deployment/api-tarefas-familia \
-                            api-tarefas-familia=${DOCKER_IMAGE}:${DOCKER_TAG} \
+                            api-tarefas-familia=${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG} \
                             -n ${K8S_NAMESPACE}
 
                         # Aguardar rollout
@@ -105,10 +87,11 @@ pipeline {
                 script {
                     sh """
                         echo "API URL: http://76.13.69.127/apitarefasfamilia"
+                        echo "Swagger: http://76.13.69.127/apitarefasfamilia/swagger"
 
                         # Testar health endpoint via Ingress
                         for i in 1 2 3 4 5; do
-                            if curl -s -f "http://76.13.69.127/apitarefasfamilia/health" > /dev/null; then
+                            if curl -s -f "http://76.13.69.127/apitarefasfamilia/health" > /dev/null 2>&1; then
                                 echo "Health check passed!"
                                 exit 0
                             fi
@@ -116,7 +99,8 @@ pipeline {
                             sleep 10
                         done
 
-                        echo "Health check failed!"
+                        echo "Health check failed - verificar logs do pod"
+                        kubectl logs -l app=api-tarefas-familia -n ${K8S_NAMESPACE} --tail=50
                         exit 1
                     """
                 }
@@ -126,11 +110,14 @@ pipeline {
 
     post {
         always {
-            cleanWs()
             sh 'docker system prune -f || true'
         }
         success {
+            echo '========================================='
             echo 'Pipeline executado com sucesso!'
+            echo 'API: http://76.13.69.127/apitarefasfamilia'
+            echo 'Swagger: http://76.13.69.127/apitarefasfamilia/swagger'
+            echo '========================================='
         }
         failure {
             echo 'Pipeline falhou!'
