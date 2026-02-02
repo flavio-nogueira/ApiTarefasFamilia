@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-tarefas-familia
+  namespace: api-tarefas
+  labels:
+    app: api-tarefas-familia
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-tarefas-familia
+  template:
+    metadata:
+      labels:
+        app: api-tarefas-familia
+    spec:
+      containers:
+        - name: api-tarefas-familia
+          image: flavionogueira/api-tarefas-familia:latest
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: api-tarefas-familia-config
+            - secretRef:
+                name: api-tarefas-familia-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      restartPolicy: Always

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-tarefas-familia-config
+  namespace: api-tarefas
+data:
+  DB_HOST: "76.13.69.127"
+  DB_PORT: "3306"
+  DB_NAME: "dbApiTarefasFamilia"
+  DB_USER: "dbamysql"
