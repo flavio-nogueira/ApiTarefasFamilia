@@ -1,0 +1,75 @@
+============================================
+API TAREFAS FAMILIA - INSTRUCOES DE USO
+============================================
+
+1. INSTALAR DEPENDENCIAS:
+   pip install -r requirements.txt
+
+2. INICIALIZAR O BANCO DE DADOS:
+   python init_db.py
+
+3. EXECUTAR A API:
+   python main.py
+
+   ou
+
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+4. ACESSAR O SWAGGER:
+   http://localhost:8000/swagger
+
+5. ACESSAR O REDOC:
+   http://localhost:8000/redoc
+
+============================================
+ENDPOINTS DISPONIVEIS:
+============================================
+
+LOCAIS (/locais):
+- GET    /locais           - Lista todos os locais
+- GET    /locais/{id}      - Obtem um local
+- POST   /locais           - Cria um local
+- PUT    /locais/{id}      - Atualiza um local
+- DELETE /locais/{id}      - Deleta um local
+
+TAREFAS (/tarefas):
+- GET    /tarefas              - Lista todas as tarefas
+- GET    /tarefas/{id}         - Obtem uma tarefa
+- GET    /tarefas/local/{id}   - Lista tarefas de um local
+- POST   /tarefas              - Cria uma tarefa
+- PUT    /tarefas/{id}         - Atualiza uma tarefa
+- DELETE /tarefas/{id}         - Deleta uma tarefa
+
+USUARIOS (/usuarios):
+- GET    /usuarios         - Lista todos os usuarios
+- GET    /usuarios/{id}    - Obtem um usuario
+- POST   /usuarios         - Cria um usuario
+- PUT    /usuarios/{id}    - Atualiza um usuario
+- DELETE /usuarios/{id}    - Deleta um usuario
+
+ATRIBUICOES (/tarefas-usuarios):
+- GET    /tarefas-usuarios                       - Lista todas as atribuicoes
+- GET    /tarefas-usuarios/{id}                  - Obtem uma atribuicao
+- GET    /tarefas-usuarios/usuario/{id}          - Lista tarefas de um usuario
+- GET    /tarefas-usuarios/tarefa/{id}           - Lista usuarios de uma tarefa
+- GET    /tarefas-usuarios/pendentes/usuario/{id} - Lista tarefas pendentes
+- POST   /tarefas-usuarios                       - Cria uma atribuicao
+- PUT    /tarefas-usuarios/{id}                  - Atualiza uma atribuicao
+- PATCH  /tarefas-usuarios/{id}/concluir         - Marca tarefa como concluida
+- DELETE /tarefas-usuarios/{id}                  - Deleta uma atribuicao
+
+CATEGORIAS (/categorias):
+- GET    /categorias       - Lista todas as categorias
+- GET    /categorias/{id}  - Obtem uma categoria
+- POST   /categorias       - Cria uma categoria
+- PUT    /categorias/{id}  - Atualiza uma categoria
+- DELETE /categorias/{id}  - Deleta uma categoria
+
+============================================
+CONFIGURACAO DO BANCO DE DADOS:
+============================================
+Host: 76.13.69.127
+Porta: 3306
+Usuario: dbamysql
+Senha: @Fn.2026@
+Banco: dbApiTarefasFamilia
