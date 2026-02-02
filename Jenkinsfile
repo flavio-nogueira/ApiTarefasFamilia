@@ -86,6 +86,7 @@ pipeline {
                         kubectl apply -f k8s/secret.yaml -n ${K8S_NAMESPACE}
                         kubectl apply -f k8s/deployment.yaml -n ${K8S_NAMESPACE}
                         kubectl apply -f k8s/service.yaml -n ${K8S_NAMESPACE}
+                        kubectl apply -f k8s/ingress.yaml -n ${K8S_NAMESPACE}
 
                         # Atualizar imagem do deployment
                         kubectl set image deployment/api-tarefas-familia \
@@ -103,20 +104,11 @@ pipeline {
             steps {
                 script {
                     sh """
-                        export KUBECONFIG=${KUBECONFIG}
+                        echo "API URL: http://76.13.69.127/apitarefafamilia"
 
-                        # Obter IP do servico
-                        SERVICE_IP=\$(kubectl get svc api-tarefas-familia -n ${K8S_NAMESPACE} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-
-                        if [ -z "\$SERVICE_IP" ]; then
-                            SERVICE_IP=\$(kubectl get svc api-tarefas-familia -n ${K8S_NAMESPACE} -o jsonpath='{.spec.clusterIP}')
-                        fi
-
-                        echo "Service IP: \$SERVICE_IP"
-
-                        # Testar health endpoint
+                        # Testar health endpoint via Ingress
                         for i in 1 2 3 4 5; do
-                            if curl -s -f "http://\$SERVICE_IP:8000/health" > /dev/null; then
+                            if curl -s -f "http://76.13.69.127/apitarefafamilia/health" > /dev/null; then
                                 echo "Health check passed!"
                                 exit 0
                             fi
