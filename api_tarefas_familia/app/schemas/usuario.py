@@ -22,3 +22,14 @@ class UsuarioResponse(UsuarioBase):
 
     class Config:
         from_attributes = True
+
+
+class LoginRequest(BaseModel):
+    login: str
+    senha: str
+
+
+class LoginResponse(BaseModel):
+    sucesso: bool
+    mensagem: str
+    usuario: Optional[UsuarioResponse] = None

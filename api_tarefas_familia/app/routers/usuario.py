@@ -5,9 +5,46 @@ import hashlib
 
 from app.database import get_db
 from app.models.usuario import Usuario
-from app.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioResponse
+from app.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioResponse, LoginRequest, LoginResponse
 
 router = APIRouter(prefix="/usuarios", tags=["Usuários"])
+
+
+@router.post("/login", response_model=LoginResponse)
+def login(dados: LoginRequest, db: Session = Depends(get_db)):
+    """
+    Realiza login do usuario.
+    Recebe login e senha, retorna dados do usuario se autenticado.
+    """
+    # Busca usuario pelo login
+    usuario = db.query(Usuario).filter(Usuario.login == dados.login).first()
+
+    if not usuario:
+        return LoginResponse(
+            sucesso=False,
+            mensagem="Usuario nao encontrado",
+            usuario=None
+        )
+
+    # Verifica senha
+    senha_hash = hash_senha(dados.senha)
+    if usuario.senha != senha_hash:
+        return LoginResponse(
+            sucesso=False,
+            mensagem="Senha incorreta",
+            usuario=None
+        )
+
+    # Login bem sucedido
+    return LoginResponse(
+        sucesso=True,
+        mensagem="Login realizado com sucesso",
+        usuario=UsuarioResponse(
+            idUsuario=usuario.idUsuario,
+            Nome=usuario.Nome,
+            login=usuario.login
+        )
+    )
 
 
 def hash_senha(senha: str) -> str:
