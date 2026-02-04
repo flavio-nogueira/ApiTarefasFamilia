@@ -31,7 +31,7 @@ def login(dados: LoginRequest, db: Session = Depends(get_db)):
     if usuario.senha != senha_hash:
         return LoginResponse(
             sucesso=False,
-            mensagem="Senha incorreta",
+            mensagem="Senha invalida",
             usuario=None
         )
 

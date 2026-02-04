@@ -145,7 +145,7 @@ class TestLogin:
         assert response.status_code == 200
         data = response.json()
         assert data["sucesso"] == False
-        assert "incorreta" in data["mensagem"].lower()
+        assert "invalida" in data["mensagem"].lower()
 
     def test_login_sucesso(self):
         """Testa login com sucesso"""
