@@ -32,7 +32,6 @@ Esta API permite gerenciar:
 - Filtros por usuário e local
     """,
     version="1.0.0",
-    root_path="/apitarefasfamilia",
     docs_url="/swagger",
     redoc_url="/redoc",
     openapi_url="/openapi.json"
