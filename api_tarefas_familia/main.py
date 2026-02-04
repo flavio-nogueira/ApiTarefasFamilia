@@ -12,6 +12,9 @@ from app.routers import local, tarefa, usuario, tarefa_usuario, category
 # Cria as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
 
+# Root path para servidor (vazio para local)
+ROOT_PATH = os.getenv("ROOT_PATH", "")
+
 # Criação da aplicação FastAPI com configuração do Swagger
 app = FastAPI(
     title="API Tarefas Família",
@@ -32,6 +35,7 @@ Esta API permite gerenciar:
 - Filtros por usuário e local
     """,
     version="1.0.0",
+    root_path=ROOT_PATH,
     docs_url="/swagger",
     redoc_url="/redoc",
     openapi_url="/openapi.json"
