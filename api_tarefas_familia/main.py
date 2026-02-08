@@ -7,7 +7,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app.database import engine, Base
-from app.routers import local, tarefa, usuario, tarefa_usuario, category
+from app.routers import local, tarefa, usuario, tarefa_usuario, category, tarefa_email
 
 # Cria as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
@@ -56,6 +56,7 @@ app.include_router(tarefa.router)
 app.include_router(usuario.router)
 app.include_router(tarefa_usuario.router)
 app.include_router(category.router)
+app.include_router(tarefa_email.router)
 
 
 @app.get("/", tags=["Root"])
