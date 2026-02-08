@@ -4,3 +4,4 @@ from .usuario import UsuarioCreate, UsuarioUpdate, UsuarioResponse, LoginRequest
 from .tarefa_usuario import TarefaUsuarioCreate, TarefaUsuarioUpdate, TarefaUsuarioResponse
 from .category import CategoryCreate, CategoryUpdate, CategoryResponse
 from .tarefa_email import TarefaEmailCreate, TarefaEmailUpdate, TarefaEmailResponse
+from .tarefa_conclusao_diaria import TarefaDoDiaResponse, TarefaDoDiaUsuarioResponse, ConclusaoDiariaResponse, HistoricoConclusaoResponse
